@@ -32,24 +32,29 @@ def master_pass():
             quit()
 
 def check_masterpass(password):
-    master_pass_requirements = {"characters": 0, "number": 0, "letter": 0, "specialChar": 0}
+    master_pass_requirements = {"characters": [8,0], "number": [1,0], "letter": [1,0], "special character": [1,0]}
     requirements_tracker = 1
     all_specialChar = "!@#$%^&*()-+?_=,;:}{?\][<>/"
     if len(password) >= 8:
-        master_pass_requirements["characters"] = 1
+        master_pass_requirements["characters"][1] = 1
     for letter in password:
         if letter.isnumeric() == True:
-            master_pass_requirements["number"] = 1
+            master_pass_requirements["number"][1] = 1
         if letter.isalpha() == True:
-            master_pass_requirements["letter"] = 1
+            master_pass_requirements["letter"][1] = 1
         if letter in all_specialChar:
-            master_pass_requirements["specialChar"] = 1
+            master_pass_requirements["special character"][1] = 1
     for i in master_pass_requirements.values():
-        requirements_tracker *= i
+        requirements_tracker *= i[1]
     if requirements_tracker == 0:
-        print(Fore.RED + "Your password must contain atleast 8 characters, 1 number, 1 letter, and 1 special character.")
+        base_error = Fore.RED + "Your password must contain "
+        for key in master_pass_requirements:
+            if master_pass_requirements[key][1] == 0:
+                base_error += str(master_pass_requirements[key][0]) + " " + key + ", "
+        print(base_error.rstrip(", ") + ".")
         db_manager.close_conn()
         quit()
+    return
 
 if __name__ == '__main__':
     db_manager.create()
